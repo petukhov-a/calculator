@@ -1,6 +1,7 @@
 const calcBtnsWrapper = document.querySelector('.calc-buttons');
 const calcScreen = document.querySelector('.calc-screen');
-let result = 0;
+let result;
+let currentOperator;
 let isOperatorClicked = false;
 
 function addCalcBtn(btnName, gridRow, girdColumn, color='#e1e1e1') {
@@ -48,7 +49,8 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 
         if (btn.textContent === 'C') {
             calcScreen.textContent = '';
-            result = 0;
+            currentOperator = null;
+            result = null;
         }
         
         if (btn.textContent === 'DEL') {
@@ -56,24 +58,56 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
         }
 
         if (btn.textContent === '+') {
-            result += +calcScreen.textContent;
-            calcScreen.textContent = result;
-            isOperatorClicked = true;
+            handleOperation('+');
+        }
+
+        if (btn.textContent === '-') {
+            handleOperation('-');
+        }
+
+        if (btn.textContent === 'X') {
+            handleOperation('X');
+        }
+
+        if (btn.textContent === '/') {
+            handleOperation('/');
+        }
+
+        if (btn.textContent === '=') {
+            currentOperator && handleOperation(currentOperator);
+            currentOperator = null;
         }
     });
 });
 
-// let operators = {
-//     '+': (result, number) => {
-//         console.log(result);
-//         result += number;
-//         calcScreen.textContent = result;
-//     }
-// }
+let operators = {
+    '+': () => {
+        result += +calcScreen.textContent;
+    },
+    '-': () => {
+        result -= +calcScreen.textContent;
+    },
+    'X': () => {
+        result *= +calcScreen.textContent;
+    },
+    '/': () => {
+        result = Math.floor((result / +calcScreen.textContent) * 1000000) / 1000000;
+    },
+}
 
-/*
-Что происходит при нажатии на "+"
-Запоминается записанное число. И сохраняется информации об операторе.
-Далее ввод второго числа. Второе число запоминается.
-При нажатии "=" используется информация об операторе и выполняется операция над числами.
-*/
+function showResult(operator) {
+    if (result) {
+        operators[operator]();
+        calcScreen.textContent = result;
+    } else {
+        result = +calcScreen.textContent;
+    }
+}
+
+function handleOperation(operator) {
+    currentOperator = operator;
+    if (!isOperatorClicked) {
+        showResult(operator);
+    }
+    isOperatorClicked = true;
+}
