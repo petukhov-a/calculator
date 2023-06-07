@@ -91,13 +91,14 @@ let operators = {
         result *= +calcScreen.textContent;
     },
     '/': () => {
-        result = Math.floor((result / +calcScreen.textContent) * 1000000) / 1000000;
+        result /= +calcScreen.textContent;
     },
 }
 
 function showResult(operator) {
     if (result) {
         operators[operator]();
+        result = Math.floor(result * 1000000) / 1000000;
         calcScreen.textContent = result;
     } else {
         result = +calcScreen.textContent;
@@ -105,9 +106,9 @@ function showResult(operator) {
 }
 
 function handleOperation(operator) {
-    currentOperator = operator;
     if (!isOperatorClicked) {
-        showResult(operator);
+        showResult(currentOperator);
     }
     isOperatorClicked = true;
+    currentOperator = operator;
 }
