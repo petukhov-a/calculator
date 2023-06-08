@@ -75,3 +75,11 @@ html {
     margin: auto;
     background-color: #e1e1e1;
 }
+
+.clear, .delete, .operation, .equal-sign {
+    background-color: #e1e1e1;
+}
+
+.digit {
+    background-color: #fff;
+}
