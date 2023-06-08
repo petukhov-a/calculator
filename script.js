@@ -2,112 +2,120 @@ const calcBtnsWrapper = document.querySelector('.calc-buttons');
 const calcScreen = document.querySelector('.calc-screen');
 let result;
 let currentOperator;
+let operator;
+let screenText = '0';
 let isOperatorClicked = false;
+let a = 0;
+let b = 0;
 
-function addCalcBtn(btnName, gridRow, girdColumn, color='#e1e1e1') {
+function addCalcBtn(btnName, gridRow, girdColumn, className) {
     const calcBtn = document.createElement('div');
-    calcBtn.classList.add('calc-btn');
+    calcBtn.classList.add('calc-btn', className);
     calcBtn.textContent = `${btnName}`;
     calcBtn.style.cssText = `
     grid-column: ${girdColumn};
-    grid-row: ${gridRow};
-    background-color: ${color};`
+    grid-row: ${gridRow};`
     calcBtnsWrapper.appendChild(calcBtn);
 }
 
-addCalcBtn('C', 1, 1);
-addCalcBtn('DEL', 1, 2);
-addCalcBtn('/', 1, 3);
-addCalcBtn('X', 1, 4);
-addCalcBtn('+', 2, 4);
-addCalcBtn('-', 3, 4);
-addCalcBtn(',', 4, 4);
-addCalcBtn('=', 5, 4);
+addCalcBtn('C', 1, 1, 'clear');
+addCalcBtn('DEL', 1, 2, 'delete');
+addCalcBtn('/', 1, 3, 'operation');
+addCalcBtn('X', 1, 4, 'operation');
+addCalcBtn('+', 2, 4, 'operation');
+addCalcBtn('-', 3, 4, 'operation');
+addCalcBtn(',', 4, 4, 'operation');
+addCalcBtn('=', 5, 4, 'equal-sign');
 
-addCalcBtn('0', 5, 2, '#fff');
-addCalcBtn('1', 2, 1, '#fff');
-addCalcBtn('2', 2, 2, '#fff');
-addCalcBtn('3', 2, 3, '#fff');
-addCalcBtn('4', 3, 1, '#fff');
-addCalcBtn('5', 3, 2, '#fff');
-addCalcBtn('6', 3, 3, '#fff');
-addCalcBtn('7', 4, 1, '#fff');
-addCalcBtn('8', 4, 2, '#fff');
-addCalcBtn('9', 4, 3, '#fff');
+addCalcBtn('0', 5, 2, 'digit');
+addCalcBtn('1', 2, 1, 'digit');
+addCalcBtn('2', 2, 2, 'digit');
+addCalcBtn('3', 2, 3, 'digit');
+addCalcBtn('4', 3, 1, 'digit');
+addCalcBtn('5', 3, 2, 'digit');
+addCalcBtn('6', 3, 3, 'digit');
+addCalcBtn('7', 4, 1, 'digit');
+addCalcBtn('8', 4, 2, 'digit');
+addCalcBtn('9', 4, 3, 'digit');
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (isFinite(btn.textContent)) {
-            if (calcScreen.textContent.length < 12) {
-                if (isOperatorClicked) {
-                    calcScreen.textContent = '';
-                    isOperatorClicked = false;
+        if (btn.classList.contains('digit')) {
+            if (isOperatorClicked === true || screenText === '0') {
+
+                if (screenText != '-') {
+                    screenText = '';
                 }
-                calcScreen.textContent += btn.textContent;
+                isOperatorClicked = false;
+
+            }
+
+            screenText += btn.textContent;
+        }
+
+        if (btn.classList.contains('operation')) {
+            isOperatorClicked = true;
+
+            if (a != 0) {
+                b = +screenText;
+            } else {
+                a = +screenText;
+            }
+
+            if (a != 0 && b != 0) {
+                screenText = operation(a, b, operator) + '';
+                a = +screenText;
+                b = 0;
+            }
+
+            operator = btn.textContent;
+
+            if (operator === '-' && a === 0) {
+                screenText = '-';
             }
         }
 
-        if (btn.textContent === 'C') {
-            calcScreen.textContent = '';
-            currentOperator = null;
-            result = null;
-        }
-        
-        if (btn.textContent === 'DEL') {
-            calcScreen.textContent = calcScreen.textContent.slice(0, -1);
-        }
-
-        if (btn.textContent === '+') {
-            handleOperation('+');
+        if (btn.classList.contains('equal-sign')) {
+            if (a != 0) {
+                b = +screenText;
+                screenText = operation(a, b, operator) + '';
+                a = 0;
+                b = 0;
+            }
         }
 
-        if (btn.textContent === '-') {
-            handleOperation('-');
+        if (btn.classList.contains('clear')) {
+            screenText = '0';
+            a = 0;
+            b = 0;
         }
 
-        if (btn.textContent === 'X') {
-            handleOperation('X');
+        if (btn.classList.contains('delete')) {
+            screenText = screenText.slice(0, -1);
+            if (screenText === '') {
+                screenText = '0';
+            }
         }
 
-        if (btn.textContent === '/') {
-            handleOperation('/');
-        }
 
-        if (btn.textContent === '=') {
-            currentOperator && handleOperation(currentOperator);
-            currentOperator = null;
-        }
+        calcScreen.textContent = screenText;
     });
 });
 
-let operators = {
-    '+': () => {
-        result += +calcScreen.textContent;
-    },
-    '-': () => {
-        result -= +calcScreen.textContent;
-    },
-    'X': () => {
-        result *= +calcScreen.textContent;
-    },
-    '/': () => {
-        result = Math.floor((result / +calcScreen.textContent) * 1000000) / 1000000;
-    },
-}
-
-function showResult(operator) {
-    if (result) {
-        operators[operator]();
-        calcScreen.textContent = result;
-    } else {
-        result = +calcScreen.textContent;
+function operation(a, b, operator) {
+    if (operator === '+') {
+        return a + b;
     }
-}
 
-function handleOperation(operator) {
-    currentOperator = operator;
-    if (!isOperatorClicked) {
-        showResult(operator);
+    if (operator === '-') {
+        return a - b;
     }
-    isOperatorClicked = true;
+
+    if (operator === 'X') {
+        return a * b;
+    }
+
+    if (operator === '/') {
+        return a / b;
+    }
 }
