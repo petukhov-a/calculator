@@ -1,12 +1,11 @@
 const calcBtnsWrapper = document.querySelector('.calc-buttons');
 const calcScreen = document.querySelector('.calc-screen');
-let result;
-let currentOperator;
 let operator;
 let screenText = '0';
 let isOperatorClicked = false;
 let a = 0;
 let b = 0;
+let numbers = [];
 
 function addCalcBtn(btnName, gridRow, girdColumn, className) {
     const calcBtn = document.createElement('div');
@@ -24,7 +23,7 @@ addCalcBtn('/', 1, 3, 'operation');
 addCalcBtn('X', 1, 4, 'operation');
 addCalcBtn('+', 2, 4, 'operation');
 addCalcBtn('-', 3, 4, 'operation');
-addCalcBtn(',', 4, 4, 'operation');
+addCalcBtn('.', 4, 4, 'point');
 addCalcBtn('=', 5, 4, 'equal-sign');
 
 addCalcBtn('0', 5, 2, 'digit');
@@ -40,14 +39,13 @@ addCalcBtn('9', 4, 3, 'digit');
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (btn.classList.contains('digit')) {
-            if (isOperatorClicked === true || screenText === '0') {
 
+        if (btn.classList.contains('digit')) {
+            if (isOperatorClicked === true) {
                 if (screenText != '-') {
                     screenText = '';
                 }
                 isOperatorClicked = false;
-
             }
 
             screenText += btn.textContent;
@@ -55,34 +53,16 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 
         if (btn.classList.contains('operation')) {
             isOperatorClicked = true;
-
-            if (a != 0) {
-                b = +screenText;
-            } else {
-                a = +screenText;
-            }
-
-            if (a != 0 && b != 0) {
-                screenText = operation(a, b, operator) + '';
-                a = +screenText;
-                b = 0;
-            }
-
+            submitOperation();
             operator = btn.textContent;
-
-            if (operator === '-' && a === 0) {
-                screenText = '-';
-            }
         }
 
         if (btn.classList.contains('equal-sign')) {
-            if (a != 0) {
-                b = +screenText;
-                screenText = operation(a, b, operator) + '';
-                a = 0;
-                b = 0;
-            }
+            submitOperation();
+            numbers = [];
         }
+
+        screenText += '';
 
         if (btn.classList.contains('clear')) {
             screenText = '0';
@@ -97,6 +77,19 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
             }
         }
 
+        if (btn.classList.contains('point')) {
+            isOperatorClicked = false;
+            numbers = [];
+            if (!screenText.includes('.')) {
+                screenText += '.';
+            }
+        }
+
+        if (isFinite(screenText)) {
+            if (screenText.at(-1) != '.') {
+                screenText = Math.floor(screenText * 1000000) / 1000000;
+            }
+        }
 
         calcScreen.textContent = screenText;
     });
@@ -117,5 +110,21 @@ function operation(a, b, operator) {
 
     if (operator === '/') {
         return a / b;
+    }
+}
+
+function calculateResult() {
+    return operation(numbers[0], numbers[1], operator);
+}
+
+function saveEnteredNumber() {
+    numbers.push(+screenText);;
+}
+
+function submitOperation() {
+    saveEnteredNumber();
+    if (numbers.length === 2) {
+        screenText = calculateResult();
+        numbers = [screenText];
     }
 }
