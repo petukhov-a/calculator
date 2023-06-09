@@ -1,6 +1,6 @@
 const calcBtnsWrapper = document.querySelector('.calc-buttons');
 const calcScreen = document.querySelector('.calc-screen');
-let operator;
+let currentOperator;
 let screenText = '0';
 let isOperatorClicked = false;
 let a = 0;
@@ -45,6 +45,7 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
                 if (screenText != '-') {
                     screenText = '';
                 }
+
                 isOperatorClicked = false;
             }
 
@@ -53,12 +54,12 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 
         if (btn.classList.contains('operation')) {
             isOperatorClicked = true;
-            submitOperation();
-            operator = btn.textContent;
+            doOperation();
+            currentOperator = btn.textContent;
         }
 
         if (btn.classList.contains('equal-sign')) {
-            submitOperation();
+            doOperation();
             numbers = [];
         }
 
@@ -66,8 +67,7 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 
         if (btn.classList.contains('clear')) {
             screenText = '0';
-            a = 0;
-            b = 0;
+            numbers = [];
         }
 
         if (btn.classList.contains('delete')) {
@@ -79,16 +79,13 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 
         if (btn.classList.contains('point')) {
             isOperatorClicked = false;
-            numbers = [];
             if (!screenText.includes('.')) {
                 screenText += '.';
             }
         }
 
-        if (isFinite(screenText)) {
-            if (screenText.at(-1) != '.') {
-                screenText = Math.floor(screenText * 1000000) / 1000000;
-            }
+        if (screenText.at(-1) != '.') {
+            screenText = Math.floor(screenText * 1000000) / 1000000;
         }
 
         calcScreen.textContent = screenText;
@@ -114,15 +111,15 @@ function operation(a, b, operator) {
 }
 
 function calculateResult() {
-    return operation(numbers[0], numbers[1], operator);
+    return operation(numbers[0], numbers[1], currentOperator);
 }
 
-function saveEnteredNumber() {
+function saveNumberFromScreen() {
     numbers.push(+screenText);;
 }
 
-function submitOperation() {
-    saveEnteredNumber();
+function doOperation() {
+    saveNumberFromScreen();
     if (numbers.length === 2) {
         screenText = calculateResult();
         numbers = [screenText];
