@@ -63,18 +63,16 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
             numbers = [];
         }
 
-        screenText += '';
-
         if (btn.classList.contains('clear')) {
             screenText = '0';
             numbers = [];
         }
 
         if (btn.classList.contains('delete')) {
-            screenText = screenText.slice(0, -1);
-            if (screenText === '') {
+            if (screenText === '' || screenText === 'Ошибка!') {
                 screenText = '0';
             }
+            screenText = screenText.slice(0, -1);
         }
 
         if (btn.classList.contains('point')) {
@@ -84,7 +82,7 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
             }
         }
 
-        if (screenText.at(-1) != '.') {
+        if (screenText.at(-1) != '.' && isFinite(screenText)) {
             screenText = Math.floor(screenText * 1000000) / 1000000;
         }
 
@@ -121,7 +119,13 @@ function saveNumberFromScreen() {
 function doOperation() {
     saveNumberFromScreen();
     if (numbers.length === 2) {
-        screenText = calculateResult();
+
+        if (numbers[1] === 0) {
+            screenText = 'Ошибка!';
+            return;
+        }
+
+        screenText = calculateResult() + '';
         numbers = [screenText];
     }
 }
