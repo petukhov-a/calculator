@@ -41,11 +41,8 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
 
         if (btn.classList.contains('digit')) {
-            if (isOperatorClicked === true) {
-                if (screenText != '-') {
-                    screenText = '';
-                }
-
+            if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
+                screenText = '';
                 isOperatorClicked = false;
             }
 
@@ -53,9 +50,15 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
         }
 
         if (btn.classList.contains('operation')) {
-            isOperatorClicked = true;
-            doOperation();
-            currentOperator = btn.textContent;
+            if (btn.textContent === '-' && screenText === '0') {
+                screenText = '-';
+            } else {
+                if (screenText != 'Ошибка!') {
+                    isOperatorClicked = true;
+                    doOperation();
+                    currentOperator = btn.textContent;
+                }
+            }
         }
 
         if (btn.classList.contains('equal-sign')) {
@@ -68,11 +71,14 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
             numbers = [];
         }
 
+        screenText += '';
+
         if (btn.classList.contains('delete')) {
             if (screenText === '' || screenText === 'Ошибка!') {
                 screenText = '0';
+            } else if (screenText != 0) {
+                screenText = screenText.slice(0, -1);
             }
-            screenText = screenText.slice(0, -1);
         }
 
         if (btn.classList.contains('point')) {
@@ -80,10 +86,6 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
             if (!screenText.includes('.')) {
                 screenText += '.';
             }
-        }
-
-        if (screenText.at(-1) != '.' && isFinite(screenText)) {
-            screenText = Math.floor(screenText * 1000000) / 1000000;
         }
 
         calcScreen.textContent = screenText;
@@ -116,16 +118,30 @@ function saveNumberFromScreen() {
     numbers.push(+screenText);;
 }
 
+function roundResult(result) {
+    return Math.floor(result * 1000000) / 1000000;
+}
+
+function isDivideByZero() {
+    if (currentOperator === '/') {
+        if (numbers[1] === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function doOperation() {
     saveNumberFromScreen();
     if (numbers.length === 2) {
-
-        if (numbers[1] === 0) {
+        if (isDivideByZero()) {
             screenText = 'Ошибка!';
+            numbers = [];
             return;
         }
 
-        screenText = calculateResult() + '';
+        screenText = calculateResult();
+        screenText = roundResult(screenText);
         numbers = [screenText];
     }
 }
