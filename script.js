@@ -39,6 +39,9 @@ addCalcBtn('9', 4, 3, 'digit');
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+        if (screenText.length > 12) {
+            screenText = screenText.slice(0, 12);
+        }
 
         if (btn.classList.contains('digit')) {
             if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
@@ -74,10 +77,9 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
         screenText += '';
 
         if (btn.classList.contains('delete')) {
+            screenText = screenText.slice(0, -1);
             if (screenText === '' || screenText === 'Ошибка!') {
                 screenText = '0';
-            } else if (screenText != 0) {
-                screenText = screenText.slice(0, -1);
             }
         }
 
