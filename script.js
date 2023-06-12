@@ -94,6 +94,24 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
     });
 });
 
+document.addEventListener('keydown', e => {
+    if (screenText.length > 12) {
+        screenText = screenText.slice(0, 12);
+    }
+
+    if (e.code.includes('Digit')) {
+        let digit = e.code.at(-1);
+        if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
+            screenText = '';
+            isOperatorClicked = false;
+        }
+
+        screenText += digit;
+        calcScreen.textContent = screenText;
+    }
+
+});
+
 function operation(a, b, operator) {
     if (operator === '+') {
         return a + b;
