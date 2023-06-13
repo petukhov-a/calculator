@@ -39,76 +39,30 @@ addCalcBtn('9', 4, 3, 'digit');
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (screenText.length > 12) {
-            screenText = screenText.slice(0, 12);
-        }
+        const isDigit = btn.classList.contains('digit'),
+              isOperation = btn.classList.contains('operation'),
+              isEqualSign = btn.classList.contains('equal-sign'),
+              isClear = btn.classList.contains('clear'),
+              isDelete = btn.classList.contains('delete'),
+              isPoint = btn.classList.contains('point');
+              keyName = btn.textContent;
 
-        if (btn.classList.contains('digit')) {
-            if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
-                screenText = '';
-                isOperatorClicked = false;
-            }
-
-            screenText += btn.textContent;
-        }
-
-        if (btn.classList.contains('operation')) {
-            if (btn.textContent === '-' && screenText === '0') {
-                screenText = '-';
-            } else {
-                if (screenText != 'Ошибка!') {
-                    isOperatorClicked = true;
-                    doOperation();
-                    currentOperator = btn.textContent;
-                }
-            }
-        }
-
-        if (btn.classList.contains('equal-sign')) {
-            doOperation();
-            numbers = [];
-        }
-
-        if (btn.classList.contains('clear')) {
-            screenText = '0';
-            numbers = [];
-        }
-
-        screenText += '';
-
-        if (btn.classList.contains('delete')) {
-            screenText = screenText.slice(0, -1);
-            if (screenText === '' || screenText === 'Ошибка!') {
-                screenText = '0';
-            }
-        }
-
-        if (btn.classList.contains('point')) {
-            isOperatorClicked = false;
-            if (!screenText.includes('.')) {
-                screenText += '.';
-            }
-        }
-
-        calcScreen.textContent = screenText;
-    });
+        calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
+    })
 });
 
 document.addEventListener('keydown', e => {
-    if (screenText.length > 12) {
-        screenText = screenText.slice(0, 12);
-    }
+    const operations = '+-/*';
 
-    if (e.code.includes('Digit')) {
-        let digit = e.code.at(-1);
-        if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
-            screenText = '';
-            isOperatorClicked = false;
-        }
+    const isDigit = isFinite(e.key),
+          isOperation = operations.includes(e.key),
+          isEqualSign = (e.key === '=' || e.key === 'Enter'),
+          isClear = e.key === 'Escape',
+          isDelete = e.key === 'Backspace',
+          isPoint = e.key === '.',
+          keyName = e.key;
 
-        screenText += digit;
-        calcScreen.textContent = screenText;
-    }
+    calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
 
 });
 
@@ -121,17 +75,13 @@ function operation(a, b, operator) {
         return a - b;
     }
 
-    if (operator === 'X') {
+    if (operator === 'X' || operator === '*') {
         return a * b;
     }
 
     if (operator === '/') {
         return a / b;
     }
-}
-
-function calculateResult() {
-    return operation(numbers[0], numbers[1], currentOperator);
 }
 
 function saveNumberFromScreen() {
@@ -160,8 +110,64 @@ function doOperation() {
             return;
         }
 
-        screenText = calculateResult();
+        screenText = operation(numbers[0], numbers[1], currentOperator);
         screenText = roundResult(screenText);
         numbers = [screenText];
     }
+}
+
+function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint) {
+    if (screenText.length > 12) {
+        screenText = screenText.slice(0, 12);
+    }
+
+    if (isDigit) {
+        if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
+            screenText = '';
+            isOperatorClicked = false;
+        }
+
+        screenText += keyName;
+    }
+
+    if (isOperation) {
+        if (keyName === '-' && screenText === '0') {
+            screenText = '-';
+        } else {
+            if (screenText != 'Ошибка!') {
+                isOperatorClicked = true;
+                doOperation();
+                currentOperator = keyName;
+            }
+        }
+    }
+
+    if (isEqualSign) {
+        doOperation();
+        numbers = [];
+    }
+
+    if (isClear) {
+        screenText = '0';
+        numbers = [];
+    }
+
+    screenText += '';
+
+    if (isDelete) {
+        if (screenText === '' || screenText === 'Ошибка!' || screenText.length === 1) {
+            screenText = '0';
+        } else {
+            screenText = screenText.slice(0, -1);
+        }
+    }
+
+    if (isPoint) {
+        isOperatorClicked = false;
+        if (!screenText.includes('.')) {
+            screenText += '.';
+        }
+    }
+
+    calcScreen.textContent = screenText;
 }
