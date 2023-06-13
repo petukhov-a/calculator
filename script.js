@@ -116,57 +116,85 @@ function doOperation() {
     }
 }
 
-function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint) {
+function checkNumberLength() {
     if (screenText.length > 12) {
         screenText = screenText.slice(0, 12);
     }
+}
+
+function handleDigitInput(keyName) {
+    if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
+        screenText = '';
+        isOperatorClicked = false;
+    }
+
+    screenText += keyName;
+}
+
+function handleOperationInput(keyName) {
+    if (keyName === '-' && screenText === '0') {
+        screenText = '-';
+    } else {
+        if (screenText != 'Ошибка!') {
+            isOperatorClicked = true;
+            doOperation();
+            currentOperator = keyName;
+        }
+    }
+}
+
+function handleEqualSignInput() {
+    doOperation();
+    numbers = [];
+}
+
+function handleClearButton() {
+    screenText = '0';
+    numbers = [];
+}
+
+function handleDeleteButton() {
+    if (screenText === '' || screenText === 'Ошибка!' || screenText.length === 1) {
+        screenText = '0';
+    } else {
+        screenText = screenText.slice(0, -1);
+    }
+}
+
+function handlePointInput() {
+    isOperatorClicked = false;
+    if (!screenText.includes('.')) {
+        screenText += '.';
+    }
+}
+
+function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint) {
+    checkNumberLength();
 
     if (isDigit) {
-        if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
-            screenText = '';
-            isOperatorClicked = false;
-        }
-
-        screenText += keyName;
+        handleDigitInput(keyName);
     }
 
     if (isOperation) {
-        if (keyName === '-' && screenText === '0') {
-            screenText = '-';
-        } else {
-            if (screenText != 'Ошибка!') {
-                isOperatorClicked = true;
-                doOperation();
-                currentOperator = keyName;
-            }
-        }
+        handleOperationInput(keyName);
     }
 
     if (isEqualSign) {
-        doOperation();
-        numbers = [];
+        handleEqualSignInput();
     }
 
     if (isClear) {
-        screenText = '0';
-        numbers = [];
+        handleClearButton();
     }
 
     screenText += '';
 
     if (isDelete) {
-        if (screenText === '' || screenText === 'Ошибка!' || screenText.length === 1) {
-            screenText = '0';
-        } else {
-            screenText = screenText.slice(0, -1);
-        }
+        handleDeleteButton();
     }
 
     if (isPoint) {
-        isOperatorClicked = false;
-        if (!screenText.includes('.')) {
-            screenText += '.';
-        }
+        handlePointInput();
     }
 
     calcScreen.textContent = screenText;
