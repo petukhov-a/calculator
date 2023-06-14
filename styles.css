@@ -74,6 +74,7 @@ html {
     cursor: pointer;
     margin: auto;
     background-color: #e1e1e1;
+    transition: 0.5s;
 }
 
 .clear, .delete, .operation, .equal-sign, .point {
@@ -82,4 +83,36 @@ html {
 
 .digit {
     background-color: #fff;
+}
+
+.active-light {
+    animation: light 0.5s;
+}
+
+.active-dark {
+    animation: dark 0.5s;
+}
+
+@keyframes light {
+    0% {
+        background-color: #e1e1e1;
+    }
+    50% {
+        background-color: #fff;
+    }
+    100% {
+        background-color: #e1e1e1;
+    }
+}
+
+@keyframes dark {
+    0% {
+        background-color: #fff;
+    }
+    50% {
+        background-color: #e1e1e1;
+    }
+    100% {
+        background-color: #fff;
+    }
 }

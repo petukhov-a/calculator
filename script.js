@@ -3,9 +3,9 @@ const calcScreen = document.querySelector('.calc-screen');
 let currentOperator;
 let screenText = '0';
 let isOperatorClicked = false;
-let a = 0;
-let b = 0;
 let numbers = [];
+
+// Creating Caclculator Buttons
 
 function addCalcBtn(btnName, gridRow, girdColumn, className) {
     const calcBtn = document.createElement('div');
@@ -37,8 +37,25 @@ addCalcBtn('7', 4, 1, 'digit');
 addCalcBtn('8', 4, 2, 'digit');
 addCalcBtn('9', 4, 3, 'digit');
 
+// End of Creating Caclculator Buttons
+
+// Handle Onscreen Calculator Buttons
+
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+
+        if (btn.classList.contains('digit')) {
+            btn.classList.toggle('active-dark');
+            setTimeout(() => {
+                btn.classList.toggle('active-dark');
+            }, 500);
+        } else {
+            btn.classList.toggle('active-light');
+            setTimeout(() => {
+                btn.classList.toggle('active-light');
+            }, 500);
+        }
+
         const isDigit = btn.classList.contains('digit'),
               isOperation = btn.classList.contains('operation'),
               isEqualSign = btn.classList.contains('equal-sign'),
@@ -48,8 +65,12 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
               keyName = btn.textContent;
 
         calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
-    })
+    });
 });
+
+// End of Handle Onscreen Calculator Buttons
+
+// Handle Keyboard Calculator Keys
 
 document.addEventListener('keydown', e => {
     const operations = '+-/*';
@@ -63,63 +84,40 @@ document.addEventListener('keydown', e => {
           keyName = e.key;
 
     calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
-
 });
 
-function operation(a, b, operator) {
-    if (operator === '+') {
-        return a + b;
+// End of Handle Keyboard Calculator Keys
+
+function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint) {
+    if (isDigit) {
+        handleDigitInput(keyName);
     }
 
-    if (operator === '-') {
-        return a - b;
+    if (isOperation) {
+        handleOperationInput(keyName);
     }
 
-    if (operator === 'X' || operator === '*') {
-        return a * b;
+    if (isEqualSign) {
+        handleEqualSignInput();
     }
 
-    if (operator === '/') {
-        return a / b;
+    if (isClear) {
+        handleClearButton();
     }
-}
 
-function saveNumberFromScreen() {
-    numbers.push(+screenText);;
-}
+    screenText += '';
 
-function roundResult(result) {
-    return Math.floor(result * 1000000) / 1000000;
-}
-
-function isDivideByZero() {
-    if (currentOperator === '/') {
-        if (numbers[1] === 0) {
-            return true;
-        }
+    if (isDelete) {
+        handleDeleteButton();
     }
-    return false;
-}
 
-function doOperation() {
-    saveNumberFromScreen();
-    if (numbers.length === 2) {
-        if (isDivideByZero()) {
-            screenText = 'Ошибка!';
-            numbers = [];
-            return;
-        }
-
-        screenText = operation(numbers[0], numbers[1], currentOperator);
-        screenText = roundResult(screenText);
-        numbers = [screenText];
+    if (isPoint) {
+        handlePointInput();
     }
-}
 
-function checkNumberLength() {
-    if (screenText.length > 12) {
-        screenText = screenText.slice(0, 12);
-    }
+    checkNumberLength();
+
+    calcScreen.textContent = screenText;
 }
 
 function handleDigitInput(keyName) {
@@ -154,7 +152,7 @@ function handleClearButton() {
 }
 
 function handleDeleteButton() {
-    if (screenText === '' || screenText === 'Ошибка!' || screenText.length === 1) {
+    if (screenText === '' || screenText === 'Error!' || screenText.length === 1) {
         screenText = '0';
     } else {
         screenText = screenText.slice(0, -1);
@@ -168,34 +166,58 @@ function handlePointInput() {
     }
 }
 
-function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint) {
-    checkNumberLength();
-
-    if (isDigit) {
-        handleDigitInput(keyName);
+function operation(a, b, operator) {
+    if (operator === '+') {
+        return a + b;
     }
 
-    if (isOperation) {
-        handleOperationInput(keyName);
+    if (operator === '-') {
+        return a - b;
     }
 
-    if (isEqualSign) {
-        handleEqualSignInput();
+    if (operator === 'X' || operator === '*') {
+        return a * b;
     }
 
-    if (isClear) {
-        handleClearButton();
+    if (operator === '/') {
+        return a / b;
     }
+}
 
-    screenText += '';
+function roundResult(result) {
+    return (result.toFixed(6) * 1000000) / 1000000;
+}
 
-    if (isDelete) {
-        handleDeleteButton();
+function isDivideByZero() {
+    if (currentOperator === '/') {
+        if (numbers[1] === 0) {
+            return true;
+        }
     }
+    return false;
+}
 
-    if (isPoint) {
-        handlePointInput();
+function doOperation() {
+    saveNumberFromScreen();
+    if (numbers.length === 2) {
+        if (isDivideByZero()) {
+            screenText = 'Error!';
+            numbers = [];
+            return;
+        }
+
+        screenText = operation(numbers[0], numbers[1], currentOperator);
+        screenText = roundResult(screenText);
+        numbers = [screenText];
     }
+}
 
-    calcScreen.textContent = screenText;
+function saveNumberFromScreen() {
+    numbers.push(+screenText);;
+}
+
+function checkNumberLength() {
+    if (screenText.length > 12) {
+        screenText = screenText.slice(0, 12);
+    }
 }
