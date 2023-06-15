@@ -8,9 +8,10 @@ let numbers = [];
 // Creating Caclculator Buttons
 
 function addCalcBtn(btnName, gridRow, girdColumn, className) {
-    const calcBtn = document.createElement('div');
+    const calcBtn = document.createElement('button');
     calcBtn.classList.add('calc-btn', className);
     calcBtn.textContent = `${btnName}`;
+    calcBtn.setAttribute('btn-name', btnName);
     calcBtn.style.cssText = `
     grid-column: ${girdColumn};
     grid-row: ${gridRow};`
@@ -37,24 +38,15 @@ addCalcBtn('7', 4, 1, 'digit');
 addCalcBtn('8', 4, 2, 'digit');
 addCalcBtn('9', 4, 3, 'digit');
 
+const calcBtns = calcBtnsWrapper.querySelectorAll('.calc-btn');
+
 // End of Creating Caclculator Buttons
 
 // Handle Onscreen Calculator Buttons
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-
-        if (btn.classList.contains('digit')) {
-            btn.classList.toggle('active-dark');
-            setTimeout(() => {
-                btn.classList.toggle('active-dark');
-            }, 500);
-        } else {
-            btn.classList.toggle('active-light');
-            setTimeout(() => {
-                btn.classList.toggle('active-light');
-            }, 500);
-        }
+        btnAnimation(btn);
 
         const isDigit = btn.classList.contains('digit'),
               isOperation = btn.classList.contains('operation'),
@@ -73,17 +65,19 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 // Handle Keyboard Calculator Keys
 
 document.addEventListener('keydown', e => {
-    const operations = '+-/*';
+    const keyboardCalcActions = {
+        '*': 'X',
+        'Backspace': 'DEL',
+        'Escape': 'C',
+        'Enter': '='
+    }
 
-    const isDigit = isFinite(e.key),
-          isOperation = operations.includes(e.key),
-          isEqualSign = (e.key === '=' || e.key === 'Enter'),
-          isClear = e.key === 'Escape',
-          isDelete = e.key === 'Backspace',
-          isPoint = e.key === '.',
-          keyName = e.key;
-
-    calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
+    calcBtns.forEach(btn => {
+        const btnText = btn.textContent;
+        if (btnText === e.key || btnText === keyboardCalcActions[e.key]) {
+            btn.click();
+        }
+    });
 });
 
 // End of Handle Keyboard Calculator Keys
@@ -118,6 +112,20 @@ function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelet
     checkNumberLength();
 
     calcScreen.textContent = screenText;
+}
+
+function btnAnimation(btn) {
+    if (btn.classList.contains('digit')) {
+        btn.classList.toggle('active-dark');
+        setTimeout(() => {
+            btn.classList.toggle('active-dark');
+        }, 500);
+    } else {
+        btn.classList.toggle('active-light');
+        setTimeout(() => {
+            btn.classList.toggle('active-light');
+        }, 500);
+    }
 }
 
 function handleDigitInput(keyName) {
@@ -185,7 +193,7 @@ function operation(a, b, operator) {
 }
 
 function roundResult(result) {
-    return (result.toFixed(6) * 1000000) / 1000000;
+    return (result.toFixed(12) * 1000000000000) / 1000000000000;
 }
 
 function isDivideByZero() {
