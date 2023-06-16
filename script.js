@@ -134,6 +134,7 @@ function handleDigitInput(keyName) {
             isOperatorClicked = false;
         }
         screenText += keyName;
+        isUserEnteredNumber = true;
     }
 }
 
@@ -141,7 +142,7 @@ function handleOperationInput(keyName) {
     if (keyName === '-' && screenText === '0') {
         screenText = '-';
     } else {
-        if (screenText != 'Error!') {
+        if (screenText != 'Error!' && screenText != '-') {
             isOperatorClicked = true;
             doOperation();
             currentOperator = keyName;
@@ -221,17 +222,11 @@ function doOperation() {
 }
 
 function saveNumberFromScreen() {
-    numbers.push(+screenText);;
-}
-
-function checkNumberLength() {
-    if (screenText.length > 12) {
-        screenText = screenText.slice(0, 12);
-    }
+    numbers.push(+screenText);
 }
 
 function isNumberOverflow() {
-    if (screenText.length > 12) {
+    if (screenText.length > 11) {
         return true;
     }
     return false;
