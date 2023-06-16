@@ -65,6 +65,7 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 // Handle Keyboard Calculator Keys
 
 document.addEventListener('keydown', e => {
+    e.preventDefault();
     const keyboardCalcActions = {
         '*': 'X',
         'Backspace': 'DEL',
@@ -109,8 +110,6 @@ function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelet
         handlePointInput();
     }
 
-    checkNumberLength();
-
     calcScreen.textContent = screenText;
 }
 
@@ -129,19 +128,20 @@ function btnAnimation(btn) {
 }
 
 function handleDigitInput(keyName) {
-    if (isOperatorClicked === true || screenText === '0' || screenText === 'Ошибка!') {
-        screenText = '';
-        isOperatorClicked = false;
+    if (!isNumberOverflow()) {
+        if (isOperatorClicked === true || screenText === '0' || screenText === 'Error!') {
+            screenText = '';
+            isOperatorClicked = false;
+        }
+        screenText += keyName;
     }
-
-    screenText += keyName;
 }
 
 function handleOperationInput(keyName) {
     if (keyName === '-' && screenText === '0') {
         screenText = '-';
     } else {
-        if (screenText != 'Ошибка!') {
+        if (screenText != 'Error!') {
             isOperatorClicked = true;
             doOperation();
             currentOperator = keyName;
@@ -183,7 +183,7 @@ function operation(a, b, operator) {
         return a - b;
     }
 
-    if (operator === 'X' || operator === '*') {
+    if (operator === 'X') {
         return a * b;
     }
 
@@ -228,4 +228,11 @@ function checkNumberLength() {
     if (screenText.length > 12) {
         screenText = screenText.slice(0, 12);
     }
+}
+
+function isNumberOverflow() {
+    if (screenText.length > 12) {
+        return true;
+    }
+    return false;
 }
