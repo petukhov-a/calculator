@@ -11,7 +11,6 @@ function addCalcBtn(btnName, gridRow, girdColumn, className) {
     const calcBtn = document.createElement('button');
     calcBtn.classList.add('calc-btn', className);
     calcBtn.textContent = `${btnName}`;
-    calcBtn.setAttribute('btn-name', btnName);
     calcBtn.style.cssText = `
     grid-column: ${girdColumn};
     grid-row: ${gridRow};`
@@ -65,7 +64,9 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
 // Handle Keyboard Calculator Keys
 
 document.addEventListener('keydown', e => {
-    e.preventDefault();
+    if (e.key === 'Enter') {
+        e.preventDefault();
+    }
     const keyboardCalcActions = {
         '*': 'X',
         'Backspace': 'DEL',
@@ -128,11 +129,11 @@ function btnAnimation(btn) {
 }
 
 function handleDigitInput(keyName) {
+    if (isOperatorClicked || screenText === '0' || screenText === 'Error!') {
+        screenText = '';
+        isOperatorClicked = false;
+    }
     if (!isNumberOverflow()) {
-        if (isOperatorClicked === true || screenText === '0' || screenText === 'Error!') {
-            screenText = '';
-            isOperatorClicked = false;
-        }
         screenText += keyName;
         isUserEnteredNumber = true;
     }

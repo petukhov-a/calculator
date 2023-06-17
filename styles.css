@@ -73,7 +73,15 @@ html {
     cursor: pointer;
     margin: auto;
     background-color: #e1e1e1;
-    transition: 0.5s;
+    transition: all 0.5s;
+}
+
+.calc-btn:hover {
+    background-color: #d8fecb;
+}
+
+.calc-btn:active {
+    transform: scale(1.1);
 }
 
 .clear, .delete, .operation, .equal-sign, .point {
@@ -84,13 +92,13 @@ html {
     background-color: #fff;
 }
 
-.active-light {
+/* .active-light {
     animation: light 0.5s;
 }
 
 .active-dark {
     animation: dark 0.5s;
-}
+} */
 
 @keyframes light {
     0% {
