@@ -45,14 +45,14 @@ const calcBtns = calcBtnsWrapper.querySelectorAll('.calc-btn');
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        btnAnimation(btn);
+        // btnAnimation(btn);
 
         const isDigit = btn.classList.contains('digit'),
               isOperation = btn.classList.contains('operation'),
               isEqualSign = btn.classList.contains('equal-sign'),
               isClear = btn.classList.contains('clear'),
               isDelete = btn.classList.contains('delete'),
-              isPoint = btn.classList.contains('point');
+              isPoint = btn.classList.contains('point'),
               keyName = btn.textContent;
 
         calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
@@ -114,19 +114,19 @@ function calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelet
     calcScreen.textContent = screenText;
 }
 
-function btnAnimation(btn) {
-    if (btn.classList.contains('digit')) {
-        btn.classList.toggle('active-dark');
-        setTimeout(() => {
-            btn.classList.toggle('active-dark');
-        }, 500);
-    } else {
-        btn.classList.toggle('active-light');
-        setTimeout(() => {
-            btn.classList.toggle('active-light');
-        }, 500);
-    }
-}
+// function btnAnimation(btn) {
+//     if (btn.classList.contains('digit')) {
+//         btn.classList.toggle('active-dark');
+//         setTimeout(() => {
+//             btn.classList.toggle('active-dark');
+//         }, 500);
+//     } else {
+//         btn.classList.toggle('active-light');
+//         setTimeout(() => {
+//             btn.classList.toggle('active-light');
+//         }, 500);
+//     }
+// }
 
 function handleDigitInput(keyName) {
     if (isOperatorClicked || screenText === '0' || screenText === 'Error!') {
@@ -135,7 +135,6 @@ function handleDigitInput(keyName) {
     }
     if (!isNumberOverflow()) {
         screenText += keyName;
-        isUserEnteredNumber = true;
     }
 }
 
@@ -194,10 +193,6 @@ function operation(a, b, operator) {
     }
 }
 
-function roundResult(result) {
-    return (result.toFixed(12) * 1000000000000) / 1000000000000;
-}
-
 function isDivideByZero() {
     if (currentOperator === '/') {
         if (numbers[1] === 0) {
@@ -213,13 +208,21 @@ function doOperation() {
         if (isDivideByZero()) {
             screenText = 'Error!';
             numbers = [];
-            return;
-        }
+        } else {
+            screenText = operation(numbers[0], numbers[1], currentOperator);
+            screenText = roundResult(screenText);
 
-        screenText = operation(numbers[0], numbers[1], currentOperator);
-        screenText = roundResult(screenText);
-        numbers = [screenText];
+            if ((screenText + '').length > 8) {
+                screenText = screenText.toExponential(8);
+            }
+
+            numbers = [screenText];
+        }
     }
+}
+
+function roundResult(result) {
+    return (result.toFixed(11) * 100000000000) / 100000000000;
 }
 
 function saveNumberFromScreen() {
