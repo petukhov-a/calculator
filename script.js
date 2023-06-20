@@ -212,7 +212,7 @@ function doOperation() {
             screenText = operation(numbers[0], numbers[1], currentOperator);
             screenText = roundResult(screenText);
 
-            if ((screenText + '').length > 8) {
+            if ((screenText + '').length > 8 && +screenText > 1) {
                 screenText = screenText.toExponential(8);
             }
 
