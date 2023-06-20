@@ -143,6 +143,10 @@ function handleOperationInput(keyName) {
         screenText = '-';
     } else {
         if (screenText != 'Error!' && screenText != '-') {
+            if (isOperatorClicked) {
+                currentOperator = keyName;
+                return;
+            }
             isOperatorClicked = true;
             doOperation();
             currentOperator = keyName;
