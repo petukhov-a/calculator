@@ -86,10 +86,15 @@ html {
 
 .clear, .delete, .operation, .equal-sign, .point {
     background-color: #e1e1e1;
+    transition: background-color 0.2s;
 }
 
 .digit {
     background-color: #fff;
+}
+
+.active {
+    background-color: #befffb;
 }
 
 /* .active-light {

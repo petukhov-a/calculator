@@ -55,6 +55,19 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
               isPoint = btn.classList.contains('point'),
               keyName = btn.textContent;
 
+        const removeActive = () => {
+            calcBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
+        if (btn.classList.contains('operation')) {
+            removeActive();
+            btn.classList.add('active');
+        } else {
+            removeActive();
+        }
+
         calculator(keyName, isDigit, isOperation, isEqualSign, isClear, isDelete, isPoint);
     });
 });
